@@ -40,14 +40,10 @@ See the `docs` folder.
 
 To build the container run this:
 ```
-docker pull mariadb:10.5.9
-docker build --no-cache -t verademo .
+docker build -t verademo .
 ```
 
-To run the container for local development run this:
-
+To run the container run this:
 ```
-docker run --rm -it -p 127.0.0.1:8080:8080 --entrypoint bash -v "$(pwd)/app:/app" verademo
+docker run -p 8080:8080 -d verademo
 ```
-
-You will then need to manually run the two commands within `/entrypoint.sh`. The first starts the DB in the background whereas the second compiles and runs the application. Typically a container shouldn't have multiple services but this was done for convenience.
