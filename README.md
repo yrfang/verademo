@@ -45,5 +45,13 @@ docker build -t verademo .
 
 To run the container run this:
 ```
-docker run -p 8080:8080 -d verademo
+docker run -p 8080:8080 --platform linux/amd64 -it verademo
 ```
+
+## Quick Commands using Makefile
+
+To simplify commands for using Docker, a Makefile is provided with the following commands:
+- `make clean` will stop and remove all docker containers
+- `make build` will build the docker image
+- `make run` will run the built docker image
+- `make restart` will rebuild the image and restart the container
