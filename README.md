@@ -48,6 +48,11 @@ To run the container run this:
 docker run -p 8080:8080 --platform linux/amd64 -it verademo
 ```
 
+To run the container and use "--rm" to automatically stop and remove the container after exiting run this:
+```
+docker run --rm -it -p 8080:8080 verademo
+```
+
 ## Quick Commands using Makefile
 
 To simplify commands for using Docker, a Makefile is provided with the following commands:
