@@ -87,7 +87,7 @@ public class UserController {
 					nextView = "redirect:" + target;
 				}
 			} else {
-				// same domain or whiltelist
+				// same domain
 				logger.info("same domain");
 				nextView = "redirect:" + target;
 			}
@@ -160,13 +160,8 @@ public class UserController {
 			HttpServletResponse response) {
 		logger.info("Entering processLogin");
 
-		List<String> whilteList = new ArrayList<>();
-		whilteList.add("https://uci.edu");
-
-		logger.info("target: " + target);
-
 		// Determine eventual redirect. Do this here in case we're already logged in
-		String nextView = redirectURL(target, "feed");;
+		String nextView = redirectURL(target, "feed");
 
 		Connection connect = null;
 		Statement sqlStatement = null;
