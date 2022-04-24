@@ -67,6 +67,38 @@ public class UserController {
 	@Autowired
 	private Environment env;
 
+	private String redirectURL(String target, String destination) {
+		List<String> whilteList = new ArrayList<>();
+		whilteList.add("https://uci.edu");
+		
+		logger.info("whilteList: " + whilteList);
+		logger.info("target: " + target);
+		
+		String nextView = "";
+
+		if (target != null && !target.isEmpty() && !target.equals("null")) {
+			if (target.startsWith("http:") || target.startsWith("https://")) {
+				// check if whitelist
+				if (!whilteList.contains(target)) {
+					logger.info("External URL but not whitelist, do nothing");
+					nextView = Utils.redirect("login");;
+				} else {
+					logger.info("External URL and whitelist, redirect");
+					nextView = "redirect:" + target;
+				}
+			} else {
+				// same domain or whiltelist
+				logger.info("same domain");
+				nextView = "redirect:" + target;
+			}
+		} else {
+			// default to user's feed
+			logger.info("default to user's feed");
+			nextView = Utils.redirect("feed");
+		}
+		return nextView;
+	}
+
 	/**
 	 * @param target
 	 * @param model
@@ -79,27 +111,18 @@ public class UserController {
 			Model model,
 			HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) {
+
 		// Check if user is already logged in
 		if (httpRequest.getSession().getAttribute("username") != null) {
 			logger.info("User is already logged in - redirecting...");
-			if (target != null && !target.isEmpty() && !target.equals("null")) {
-				return "redirect:" + target;
-			} else {
-				// default to user's feed
-				return Utils.redirect("feed");
-			}
+			return redirectURL(target, "feed");
 		}
 
 		User user = UserFactory.createFromRequest(httpRequest);
 		if (user != null) {
 			Utils.setSessionUserName(httpRequest, httpResponse, user.getUserName());
 			logger.info("User is remembered - redirecting...");
-			if (target != null && !target.isEmpty() && !target.equals("null")) {
-				return "redirect:" + target;
-			} else {
-				// default to user's feed
-				return Utils.redirect("feed");
-			}
+			return redirectURL(target, "feed");
 		} else {
 			logger.info("User is not remembered");
 		}
@@ -137,14 +160,13 @@ public class UserController {
 			HttpServletResponse response) {
 		logger.info("Entering processLogin");
 
+		List<String> whilteList = new ArrayList<>();
+		whilteList.add("https://uci.edu");
+
+		logger.info("target: " + target);
+
 		// Determine eventual redirect. Do this here in case we're already logged in
-		String nextView;
-		if (target != null && !target.isEmpty() && !target.equals("null")) {
-			nextView = "redirect:" + target;
-		} else {
-			// default to user's feed
-			nextView = Utils.redirect("feed");
-		}
+		String nextView = redirectURL(target, "feed");;
 
 		Connection connect = null;
 		Statement sqlStatement = null;
