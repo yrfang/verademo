@@ -663,31 +663,39 @@ public class UserController {
 		OutputStream outStream = null;
 		try {
 			File downloadFile = new File(path);
-			inputStream = new FileInputStream(downloadFile);
 
 			// get MIME type of the file
 			String mimeType = context.getMimeType(path);
-			if (mimeType == null) {
-				// set to binary type if MIME mapping not found
-				mimeType = "application/octet-stream";
-			}
 			logger.info("MIME type: " + mimeType);
 
-			// Set content attributes for the response
-			response.setContentType(mimeType);
-			response.setContentLength((int) downloadFile.length());
-			response.setHeader("Content-Disposition", "attachment; filename=" + imageName);
+			String BASE_DIRECTORY = "/app/src/main/webapp/resources/images/";
 
-			// get output stream of the response
-			outStream = response.getOutputStream();
-			byte[] buffer = new byte[4096];
-			int bytesRead = -1;
+			// canonicalizing file names to check the directory matches image directory
+			if (downloadFile.getCanonicalPath().startsWith(BASE_DIRECTORY)) {
 
-			// write bytes read from the input stream into the output stream
-			while ((bytesRead = inputStream.read(buffer)) != -1) {
-				outStream.write(buffer, 0, bytesRead);
+				// restrict png file type
+				if (downloadFile.exists() && mimeType == "image/png") {
+					inputStream = new FileInputStream(downloadFile);
+
+					// Set content attributes for the response
+					response.setContentType(mimeType);
+					response.setContentLength((int) downloadFile.length());
+					response.setHeader("Content-Disposition", "attachment; filename=" + imageName);
+
+					// get output stream of the response
+					outStream = response.getOutputStream();
+					byte[] buffer = new byte[4096];
+					int bytesRead = -1;
+
+					// write bytes read from the input stream into the output stream
+					while ((bytesRead = inputStream.read(buffer)) != -1) {
+						outStream.write(buffer, 0, bytesRead);
+					}
+				}
+				outStream.flush();
+			} else {
+				logger.info("Wrong directory or file type");
 			}
-			outStream.flush();
 		} catch (IllegalStateException | IOException ex) {
 			logger.error(ex);
 		} finally {
