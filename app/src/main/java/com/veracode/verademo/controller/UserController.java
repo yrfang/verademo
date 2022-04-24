@@ -93,8 +93,8 @@ public class UserController {
 			}
 		} else {
 			// default to user's feed
-			logger.info("default to user's feed");
-			nextView = Utils.redirect("feed");
+			logger.info("default to user's " + destination);
+			nextView = Utils.redirect(destination);
 		}
 		return nextView;
 	}
