@@ -164,7 +164,7 @@ public class UserController {
 		String nextView = redirectURL(target, "feed");
 
 		Connection connect = null;
-		Statement sqlStatement = null;
+		PreparedStatement sqlStatement = null;
 
 		try {
 			// Get the Database Connection
@@ -172,15 +172,13 @@ public class UserController {
 			Class.forName("com.mysql.jdbc.Driver");
 			connect = DriverManager.getConnection(Constants.create().getJdbcConnectionString());
 
-			/* START BAD CODE */
 			// Execute the query
 			logger.info("Creating the Statement");
-			String sqlQuery = "select username, password, password_hint, created_at, last_login, real_name, blab_name from users where username='"
-					+ username + "' and password='" + md5(password) + "';";
-			sqlStatement = connect.createStatement();
-			logger.info("Execute the Statement");
-			ResultSet result = sqlStatement.executeQuery(sqlQuery);
-			/* END BAD CODE */
+			String sqlQuery = "select username, password, password_hint, created_at, last_login, real_name, blab_name from users where username= ? AND password= md5(?);";
+			sqlStatement = connect.prepareStatement(sqlQuery);
+			sqlStatement.setString(1, username);
+			sqlStatement.setString(2, password);
+			ResultSet result = sqlStatement.executeQuery();
 
 			// Did we find exactly 1 user that matched?
 			if (result.first()) {
